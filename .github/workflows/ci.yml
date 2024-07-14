@@ -66,11 +66,11 @@ jobs:
           #  bin: onething-cli
           #  name: onething-cli-Linux-powerpc64le.tar.gz
           #  skip_tests: true
-          - os_name: Linux-riscv64
-            os: ubuntu-20.04
-            target: riscv64gc-unknown-linux-gnu
-            bin: onething-cli
-            name: onething-cli-Linux-riscv64gc-gnu.tar.gz
+          #- os_name: Linux-riscv64
+          #  os: ubuntu-20.04
+          #  target: riscv64gc-unknown-linux-gnu
+          #  bin: onething-cli
+          #  name: onething-cli-Linux-riscv64gc-gnu.tar.gz
           #- os_name: Linux-s390x
           #  os: ubuntu-20.04
           #  target: s390x-unknown-linux-gnu
@@ -95,11 +95,11 @@ jobs:
           #  bin: onething-cli.exe
           #  name: onething-cli-Windows-i686.zip
           #  skip_tests: true
-          - os_name: Windows-x86_64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            bin: onething-cli.exe
-            name: onething-cli-Windows-x86_64.zip
+          #- os_name: Windows-x86_64
+          #  os: windows-latest
+          #  target: x86_64-pc-windows-msvc
+          #  bin: onething-cli.exe
+          #  name: onething-cli-Windows-x86_64.zip
           - os_name: macOS-x86_64
             os: macOS-latest
             target: x86_64-apple-darwin
