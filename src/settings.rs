@@ -1,39 +1,44 @@
 use config::Config;
 use directories::ProjectDirs;
 use std::error::Error;
+use std::sync::Mutex;
 
+#[derive(Clone)]
 pub struct Settings {
 	pub token: String,
 	pub api_url: String,
 }
 
-pub fn load_settings() -> Result<Settings, Box<dyn Error>> {
+fn load_settings() -> Result<Settings, Box<dyn Error>> {
 
-	let config_file = match ProjectDirs::from("com", "Matt Tew", "OneThing") {
-		Some(project_dirs) => Some(project_dirs.config_dir().join("onething.toml")),
-		None => None,
-	};
+	let config_file = ProjectDirs::from("com", "Matt Tew", "OneThing")
+		.map(|project_dirs| project_dirs.config_dir().join("onething.toml"));
 
 	let mut config_builder = Config::builder();
 
-	if config_file.is_some() {
-		config_builder = config_builder.add_source(config::File::with_name(config_file.unwrap().to_str().unwrap()));
+	if let Some(config_file) = config_file {
+		config_builder = config_builder.add_source(config::File::with_name(config_file.to_str().unwrap()));
 	}
 
 	let config_values = config_builder
 		.add_source(config::Environment::with_prefix("ONETHING"))
-		.build();
+		.build()?;
 
-	match config_values {
-		Ok(config_values) => {
-			let token = config_values.get_string("token")?;
-			let api_url = match config_values.get_string("api_url") {
-				Ok(url) => url,
-				Err(_) => "https://api.matt.tew.io/".to_string(),
-			};
+	let token = config_values.get_string("token")?;
+			let api_url = config_values.get_string("api_url").unwrap_or_else(|_| "https://onething.matt.tew.io/api/".to_string());
 
-			Ok(Settings { token, api_url })
-		}
-		Err(e) => Err(Box::new(e)),
+	Ok(Settings { token, api_url })
+
+}
+
+static SETTINGS: Mutex<Option<Settings>> = Mutex::new(None);
+
+pub fn get_settings() -> Result<Settings, Box<dyn Error>> {
+	let mut settings = SETTINGS.lock()?;
+
+	if settings.is_none() {
+		*settings = Some(load_settings()?);
 	}
+
+	Ok(settings.as_ref().unwrap().clone())
 }
