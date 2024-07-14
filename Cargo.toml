@@ -1,0 +1,13 @@
+[package]
+name = "onething-cli"
+version = "0.0.1"
+edition = "2021"
+description = "A personal command line tool to access OneThing tools via the CLI"
+license = "MIT"
+repository = "https://github.com/intellis-team/onething-cli"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+config = "0.14.0"
+directories = "5.0"
