@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
+use colored::{Colorize, ColoredString};
 
 use crate::http_client::get;
 
@@ -74,11 +75,31 @@ pub struct Task {
     pub attachments: Vec<Attachment>,
 }
 
+impl Task {
+		pub fn colored_dot(&self) -> ColoredString {
+				let dot = "";
+				if self.html_colour.is_none() {
+						return dot.clear();
+				}
+				let colour = self.html_colour.as_ref().unwrap();
+				// parse the hex colour
+				let colour = match u32::from_str_radix(&colour[1..], 16) {
+						Ok(c) => c,
+						Err(_) => return dot.clear(),
+				};
+				// extract the RGB values
+				let r = (colour >> 16) & 0xFF;
+				let g = (colour >> 8) & 0xFF;
+				let b = colour & 0xFF;
+				return dot.truecolor(r.try_into().unwrap(), g.try_into().unwrap(), b.try_into().unwrap());
+		}
+}
+
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TaskWithFocus {
-    pub task: Task,
+    pub task: Option<Task>,
     pub focus_event: Option<FocusEventModel>,
 }
 

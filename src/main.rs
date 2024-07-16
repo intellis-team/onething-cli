@@ -4,6 +4,7 @@ mod tasks;
 
 use std::error::Error;
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -40,7 +41,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 			match command {
 				Some(TaskCommands::Current) => {
 					let current_task = tasks::get_one()?;
-					println!("{}", current_task.task.title);
+					match current_task.task {
+						Some(task) => {
+							println!("{} {}", task.colored_dot(), task.title);
+						}
+						None => {
+							println!("{}","No tasks in the current context".green());
+						}
+					}
 				}
 				Some(TaskCommands::List) => {
 					println!("List tasks");
