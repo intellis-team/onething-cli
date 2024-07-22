@@ -25,7 +25,7 @@ fn load_settings() -> Result<Settings, Box<dyn Error>> {
 		.build()?;
 
 	let token = config_values.get_string("token")?;
-			let api_url = config_values.get_string("api_url").unwrap_or_else(|_| "https://onething.matt.tew.io/api/".to_string());
+			let api_url = config_values.get_string("api_url").unwrap_or_else(|_| "https://one.thing.tools/api/".to_string());
 
 	Ok(Settings { token, api_url })
 
