@@ -1,6 +1,7 @@
 mod settings;
 mod http_client;
 mod tasks;
+mod dnd;
 
 use std::error::Error;
 use clap::{Parser, Subcommand};
@@ -21,6 +22,10 @@ enum Commands {
     	#[command(subcommand)]
     	command: Option<TaskCommands>,
     },
+		Dnd {
+			#[command(subcommand)]
+			command: Option<DndCommands>,
+		},
 }
 
 #[derive(Subcommand)]
@@ -30,6 +35,15 @@ enum TaskCommands {
 
 		/// List all tasks
 		List,
+}
+
+#[derive(Subcommand)]
+enum DndCommands {
+		/// Show the current task
+		Status,
+
+		/// List all tasks
+		Time,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -55,6 +69,39 @@ fn main() -> Result<(), Box<dyn Error>> {
 				}
 				None => {
 					println!("No task command");
+				}
+			}
+		}
+		Some(Commands::Dnd { command }) => {
+			match command {
+				Some(DndCommands::Status) => {
+					let status = dnd::get_status()?;
+					match status {
+						Some(status) => {
+							if status.do_not_disturb {
+								println!("Do not disturb until {}", status.ends.unwrap());
+							} else {
+								println!("Not in do not disturb mode");
+							}
+						}
+						None => {
+							println!("No status");
+						}
+					}
+				}
+				Some(DndCommands::Time) => {
+					let status = dnd::get_status()?;
+					match status {
+						Some(status) => {
+							println!("{}", status.colored_time());
+						}
+						None => {
+							println!("");
+						}
+					}
+				}
+				None => {
+					println!("No dnd command");
 				}
 			}
 		}
