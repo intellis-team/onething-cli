@@ -26,6 +26,10 @@ enum Commands {
 			#[command(subcommand)]
 			command: Option<DndCommands>,
 		},
+		Time {
+			#[command(subcommand)]
+			command: Option<TimeCommands>,
+		},
 }
 
 #[derive(Subcommand)]
@@ -44,6 +48,15 @@ enum DndCommands {
 
 		/// List all tasks
 		Time,
+}
+
+#[derive(Subcommand)]
+enum TimeCommands {
+		/// Show the current task
+		Current,
+
+		/// List all tasks
+		Context,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -102,6 +115,31 @@ fn main() -> Result<(), Box<dyn Error>> {
 				}
 				None => {
 					println!("No dnd command");
+				}
+			}
+		}
+		Some(Commands::Time { command }) => {
+			match command {
+				Some(TimeCommands::Current) => {
+					println!("{}", chrono::Local::now().format("%H:%M"));
+				}
+				Some(TimeCommands::Context) => {
+					let dnd_status = dnd::get_status()?;
+					match dnd_status {
+						Some(status) => {
+							if status.do_not_disturb {
+								println!("{} {}", "".truecolor(0xFF, 0x7B, 0x00), status.colored_time());
+							} else {
+								println!("{} {}",	"󰥔", chrono::Local::now().format("%H:%M"));
+							}
+						}
+						None => {
+							println!("{} {}",	"󰥔", chrono::Local::now().format("%H:%M"));
+						}
+					}
+				}
+				None => {
+					println!("No time command");
 				}
 			}
 		}
