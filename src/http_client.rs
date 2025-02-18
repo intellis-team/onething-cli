@@ -11,12 +11,20 @@ struct HttpError {
 }
 
 impl Display for HttpError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "HTTP error: {}", self.status)
-    }
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "HTTP error: {}", self.status)
+	}
 }
 
 impl Error for HttpError {}
+
+const fn fix_empty_json_str(json: &str) -> &str {
+	if json.is_empty() {
+		"null"
+	} else {
+		json
+	}
+}
 
 pub fn get<TOut>(url: &str) -> Result<TOut, Box<dyn Error>>
 where
@@ -37,12 +45,18 @@ where
 	//println!("Response: {:?}", response);
 
 	if response.status().is_success() {
-		//let body = response.text()?;
+		let body = response.text()?;
 		//println!("Response body: {}", body);
 
-		//let result = serde_json::from_str::<TOut>(&body)?;
-		let result = response.json::<TOut>()?;
-		Ok(result)
+		match serde_json::from_str(fix_empty_json_str(&body)) {
+			Ok(result) => Ok(result),
+			Err(e) => {
+				println!("Error parsing JSON: {}", e);
+				Err(Box::new(e))
+			}
+		}
+		//let result: TOut = serde_json::from_str(&body)?;
+		//Ok(result)
 	} else {
 		Err(Box::new(HttpError { status: response.status() }))
 	}

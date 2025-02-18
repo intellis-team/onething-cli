@@ -11,6 +11,8 @@ pub struct Status {
 	pub do_not_disturb: bool,
 	pub ends: Option<DateTime<Utc>>,
 	pub reason: Option<String>,
+	pub emoji: Option<String>,
+	pub html_color: Option<String>,
 }
 
 impl Status {
@@ -39,5 +41,5 @@ impl Status {
 }
 
 pub fn get_status() -> Result<Option<Status>, Box<dyn std::error::Error>> {
-	get::<Option<Status>>("dnd")
+	get::<Option<Status>>("status")
 }

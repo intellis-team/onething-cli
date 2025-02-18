@@ -60,6 +60,7 @@ enum TimeCommands {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+	env_logger::init();
 
 	let cli = Cli::parse();
 
@@ -68,7 +69,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 			match command {
 				Some(TaskCommands::Current) => {
 					let current_task = tasks::get_one()?;
-					match current_task.task {
+					match current_task {
 						Some(task) => {
 							println!("{} {}", task.colored_dot(), task.title);
 						}
@@ -92,7 +93,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 					match status {
 						Some(status) => {
 							if status.do_not_disturb {
-								println!("Do not disturb until {}", status.ends.unwrap());
+								match status.ends {
+									Some(ends) => {
+										println!("Do not disturb until {}: {} {}", ends, status.emoji.as_ref().unwrap_or(&"⛔".to_string()), status.reason.as_ref().unwrap_or(&"".to_string()));
+									}
+									None => {
+										println!("Do not disturb indefinitely: {} {}", status.emoji.as_ref().unwrap_or(&"⛔".to_string()), status.reason.as_ref().unwrap_or(&"".to_string()));
+									}
+								}
 							} else {
 								println!("Not in do not disturb mode");
 							}
@@ -128,9 +136,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 					match dnd_status {
 						Some(status) => {
 							if status.do_not_disturb {
-								println!("{} {}", "".truecolor(0xFF, 0x7B, 0x00), status.colored_time());
+								println!("{} {}", status.emoji.as_ref().unwrap_or(&"".to_string()).truecolor(0xFF, 0x7B, 0x00), status.colored_time());
 							} else {
-								println!("{} {}",	"󰥔", chrono::Local::now().format("%H:%M"));
+								println!("{} {}",	status.emoji.as_ref().unwrap_or(&"󰥔".to_string()), chrono::Local::now().format("%H:%M"));
 							}
 						}
 						None => {
