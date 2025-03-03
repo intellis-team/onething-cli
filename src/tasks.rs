@@ -72,7 +72,7 @@ pub struct Task {
 	//pub time_resolved: Option<DateTime<Utc>>,
 	pub calendar_event_id: Option<String>,
 	pub html_colour: Option<String>,
-	pub attachments: Vec<Attachment>,
+	//pub attachments: Vec<Attachment>,
 	pub id: String,
 	pub deleted: bool,
 	pub version: i32,
